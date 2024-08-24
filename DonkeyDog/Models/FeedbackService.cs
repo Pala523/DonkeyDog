@@ -70,7 +70,7 @@ namespace DonkeyDog.Models
                 IsBodyHtml = false,
             };
 
-            mailMessage.To.Add("charyassine2004@gmail.com"); 
+            mailMessage.To.Add("donkeydog.autosend@gmail.com"); 
 
             try
             {

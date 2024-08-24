@@ -58,6 +58,18 @@ builder.Services.ConfigureMongoDbIdentity<ApplicationUser, MongoIdentityRole<Gui
     .AddRoleManager<RoleManager<MongoIdentityRole<Guid>>>()
     .AddDefaultTokenProviders();
 
+// Leggi i valori JWT dalla stringa di connessione
+var jwtSettings = builder.Configuration.GetSection("ConnectionStrings:JwtSettings");
+
+var jwtSecret = jwtSettings["Secret"];
+var jwtValidIssuer = jwtSettings["ValidIssuer"];
+var jwtValidAudience = jwtSettings["ValidAudience"];
+
+if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(jwtValidIssuer) || string.IsNullOrEmpty(jwtValidAudience))
+{
+    throw new InvalidOperationException("One or more JWT configuration settings are missing.");
+}
+
 // Configura l'autenticazione JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -72,9 +84,9 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
-        ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")))
+        ValidAudience = jwtValidAudience,
+        ValidIssuer = jwtValidIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
     };
 });
 
