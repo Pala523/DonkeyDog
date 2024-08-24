@@ -83,7 +83,7 @@ builder.Services.AddControllers();
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',');
+var allowedOrigins = "*";
 builder.Services.AddCors(o =>
 {
     o.AddPolicy(MyAllowSpecificOrigins, b =>
