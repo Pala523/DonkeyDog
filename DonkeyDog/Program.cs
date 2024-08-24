@@ -17,8 +17,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurazione BsonDefaults
 BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V2;
 
-// Configurazione MongoDB
-var mongoDbSettings = builder.Configuration.GetConnectionString("DbConnection");
+// Configura la stringa di connessione MongoDB da una variabile d'ambiente
+var mongoDbSettings = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING");
+if (string.IsNullOrEmpty(mongoDbSettings))
+{
+    throw new InvalidOperationException("La variabile d'ambiente MONGODB_CONNECTION_STRING non è impostata.");
+}
 var mongoClient = new MongoClient(mongoDbSettings);
 var mongoDatabase = mongoClient.GetDatabase("Cluster0"); // Assicurati che questo sia il nome corretto del tuo database
 
@@ -68,9 +72,9 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")))
     };
 });
 
@@ -79,13 +83,14 @@ builder.Services.AddControllers();
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',');
 builder.Services.AddCors(o =>
 {
     o.AddPolicy(MyAllowSpecificOrigins, b =>
     {
-        b.AllowAnyOrigin()
-        .AllowAnyMethod().AllowAnyHeader();
+        b.WithOrigins(allowedOrigins)
+        .AllowAnyMethod()
+        .AllowAnyHeader();
     });
 });
 
@@ -126,7 +131,6 @@ builder.Services.AddSingleton<IMongoDatabase>(mongoDatabase);
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddSingleton<ServiziService>();
 builder.Services.AddSingleton<FeedbackService>();
-
 
 builder.Services.AddSingleton(serviceProvider =>
 {
