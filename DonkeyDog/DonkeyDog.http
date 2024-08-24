@@ -1,0 +1,6 @@
+@DonkeyDog_HostAddress = http://localhost:5008
+
+GET {{DonkeyDog_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

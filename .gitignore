@@ -1,0 +1,6 @@
+# Escludere la cartella .vs generata da Visual Studio
+.vs/
+
+# Escludere altri file e cartelle che non devono essere nel repository
+bin/
+obj/
