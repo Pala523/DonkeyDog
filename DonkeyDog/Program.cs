@@ -59,7 +59,7 @@ builder.Services.ConfigureMongoDbIdentity<ApplicationUser, MongoIdentityRole<Gui
     .AddDefaultTokenProviders();
 
 // Leggi i valori JWT dalla stringa di connessione
-var jwtSettings = builder.Configuration.GetSection("ConnectionStrings:JwtSettings");
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
 var jwtSecret = jwtSettings["Secret"];
 var jwtValidIssuer = jwtSettings["ValidIssuer"];
