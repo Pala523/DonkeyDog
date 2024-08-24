@@ -1,10 +1,10 @@
-# Usa l'immagine di base di ASP.NET Core
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+# Usa l'immagine di base di ASP.NET Core 8.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-# Usa l'immagine di build di ASP.NET Core
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+# Usa l'immagine di build di .NET SDK 8.0
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["DonkeyDog/DonkeyDog.csproj", "DonkeyDog/"]
 RUN dotnet restore "DonkeyDog/DonkeyDog.csproj"
