@@ -17,7 +17,7 @@ namespace DonkeyDog.Controllers
         private readonly RoleManager<MongoIdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthenticateController(UserManager<ApplicationUser> userManager,RoleManager<MongoIdentityRole<Guid>> roleManager,IConfiguration configuration)
+        public AuthenticateController(UserManager<ApplicationUser> userManager, RoleManager<MongoIdentityRole<Guid>> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -44,10 +44,10 @@ namespace DonkeyDog.Controllers
 
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, model.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
+                {
+                    new Claim(ClaimTypes.Name, model.Username),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
                 foreach (var userRole in userRoles)
                 {
@@ -152,11 +152,13 @@ namespace DonkeyDog.Controllers
 
         private JwtSecurityToken GetToken(List<Claim> authClaims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
+                issuer: jwtSettings["ValidIssuer"],
+                audience: jwtSettings["ValidAudience"],
                 expires: DateTime.Now.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
