@@ -91,21 +91,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configura i servizi MVC
-builder.Services.AddControllers();
-
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
 builder.Services.AddCors(o =>
 {
     o.AddPolicy(MyAllowSpecificOrigins, b =>
     {
-        b.WithOrigins("https://donkeydogcinofilo.it/", "http://donkeydogcinofilo.it/") 
+        b.AllowAnyOrigin()
          .AllowAnyMethod()
-         .AllowAnyHeader()
-         .AllowCredentials();
+         .AllowAnyHeader();
     });
 });
+
+// Configura i servizi MVC
+builder.Services.AddControllers();
 
 // Configura Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -159,6 +157,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors(MyAllowSpecificOrigins);
 app.UseHttpsRedirection();
 app.UseAuthentication();
