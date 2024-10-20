@@ -18,7 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V2;
 
 // Configura la stringa di connessione MongoDB da una variabile d'ambiente
-var mongoDbSettings = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING");
+var mongoDbSettings = builder.Configuration.GetConnectionString("DbConnection");
+
 if (string.IsNullOrEmpty(mongoDbSettings))
 {
     throw new InvalidOperationException("La variabile d'ambiente MONGODB_CONNECTION_STRING non è impostata.");
@@ -95,23 +96,14 @@ builder.Services.AddControllers();
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-var allowedOrigins = "*";
 builder.Services.AddCors(o =>
 {
     o.AddPolicy(MyAllowSpecificOrigins, b =>
     {
-        if (allowedOrigins.Contains("*"))
-        {
-            b.AllowAnyOrigin()
-             .AllowAnyMethod()
-             .AllowAnyHeader();
-        }
-        else
-        {
-            b.WithOrigins(allowedOrigins)
-             .AllowAnyMethod()
-             .AllowAnyHeader();
-        }
+        b.WithOrigins("https://donkeydogcinofilo.it/", "http://donkeydogcinofilo.it/") 
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+         .AllowCredentials();
     });
 });
 
